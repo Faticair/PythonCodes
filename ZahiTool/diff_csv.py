@@ -64,6 +64,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # o = [1,2,3,4,5]
-    # n = [1,2,3,4,5]
-    # print(is_list_diff(o,n))
