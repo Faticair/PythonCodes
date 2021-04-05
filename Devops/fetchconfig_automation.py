@@ -1,32 +1,49 @@
-import os
-import time
-import socket
 import datetime
-import schedule
-import paramiko
+import os
+import socket
+import time
 
-def autojob():
+import paramiko
+import schedule
+
+
+def main():
     print('###### Start automative job: ' + datetime.date.today().isoformat() + ' ######')
-    f = open(os.getcwd() + '\\fetchlist.txt', 'r')
+
+    SrcFile = os.getcwd() + '\\fetchlist.txt'
+    DstPath = 'E:\\zxchen\\logs\\' + datetime.date.today().isoformat()
+    print('### Source list is: ' + SrcFile)
+    check_dir(DstPath)
+    print('### Destination dir is: ' + DstPath + '\n')
+    autojob(SrcFile, DstPath)
+    
+def autojob(srcfile, dstpath):    
+    f = open(srcfile, 'r')
     for line in f.readlines():
         ip, name, password, sleeptime = line.split()
+        dstfilepath = dstpath + os.sep + name + '.txt'
+
         print('### Start '+ name + '...\n')
         
         sshcilent, isSuccess = ssh_connect(ip, 'admin', password)
-
         if not isSuccess:
             print('### Connection Failed.')
-            generate_report('Failed', name)
+            generate_report('Failed', dstfilepath)
             continue
         
         cmdlist = ['screen-length 0 temporary\n', 'display curr\n']
         timelist = [0.5, int(sleeptime)]
         output = ssh_execute(sshcilent, cmdlist, timelist)
-
         sshcilent.close()
-        generate_report(output, name)
+        generate_report(output, dstfilepath)
     f.close()
-        
+
+def check_dir(dirpath):
+    if not os.path.exists(dirpath):
+        os.mkdir(dirpath)
+    else:
+        pass
+
 def ssh_connect(hip, user, hpassword):
     print('\n### Trying to connect to host...')
     ssh_success = False
@@ -54,9 +71,8 @@ def ssh_execute(client, cmds, slptime):
     return res
 
 
-def generate_report(res, devname):
-    NewPath = 'E:\\zxchen\\logs\\' + datetime.date.today().isoformat() + os.sep + devname + '.txt'
-    with open(NewPath, 'w+') as new_file:
+def generate_report(res, filepath):
+    with open(filepath, 'w+') as new_file:
         new_file.write(res)
         new_file.close()
         
@@ -67,7 +83,4 @@ if __name__ == '__main__':
 #     schedule.every().day.at('12:00').do(autojob)
 #     while True:
 #         schedule.run_pending()
-    todaypath = 'E:\\zxchen\\logs\\' + datetime.date.today().isoformat()
-    if not os.path.exists(todaypath):
-        os.mkdir(todaypath)
-    autojob()
+    main()
