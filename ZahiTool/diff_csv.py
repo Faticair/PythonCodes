@@ -2,7 +2,7 @@ import csv
 import os
 import datetime
 
-def read_csv_file(csvpath):
+def read_csv_file(csvpath): # read csv file, return a hashdic and a idlist(id is the key of hashdic)
     hashdic = {}
     idlist = []
     with open(csvpath, encoding='utf-8') as csv_file:
@@ -12,31 +12,31 @@ def read_csv_file(csvpath):
             idlist.append(row[0])
     return hashdic, idlist
 
-def set_diff(leftset, rightset):
+def set_diff(leftset, rightset): # return the leftset - rightset
     return list(leftset.difference(rightset))
 
-def is_list_diff(oldlist, newlist):
+def is_list_diff(oldlist, newlist): # compare the old list and the new list, return whether they are different 
     different = False
     for (olditem, newitem) in zip(oldlist, newlist):
         if olditem != newitem:
             different = True
     return different
 
-def item_print(printmode, items, referdic):
+def item_print(printmode, items, referdic): # print items
     for index in items:
         # print('\n### ' + printmode + ' item: ' + format_value(referdic.pop(index)))
         mytext = '\n\n### ' + printmode + ' item: ' + format_value(referdic.pop(index))
         output_to_file(mytext)
 
-def format_value(originvalue):
+def format_value(originvalue): # remove the '\t' of origin string 
     return str(originvalue).replace('\\t', '')
 
-def output_to_file(text):
+def output_to_file(text): # write the output to the designated file
     filepath = 'D:\\Files\\MyJob\\Wireless\\matter\\diff_' + datetime.date.today().isoformat() + '.txt'
     with open(filepath, 'a+', encoding='utf-8') as f:
         f.write(text)
 
-def file_compare(Oldfile, Newfile):
+def file_compare(Oldfile, Newfile): # 
     ohashdic, oidlist = read_csv_file(Oldfile)
     nhashdic, nidlist = read_csv_file(Newfile)
     increaseitem = set_diff(set(nidlist), set(oidlist))
@@ -46,7 +46,6 @@ def file_compare(Oldfile, Newfile):
         output_to_file('\n\n### NO new item.')
     else:
         item_print('New', increaseitem, nhashdic)
-
     if not decreaseitem:
         # print('### NO item miss.')
         output_to_file('\n\n### NO item miss.')
@@ -65,9 +64,9 @@ def file_compare(Oldfile, Newfile):
             output_to_file(mytext)
 def main():
     rootpath = 'D:\\Files\\MyJob\\Wireless\\matter\\'
-    oldfile = 'AC6805-apInfo-0322-all.csv'
-    newfile = 'AC6805-apInfo-0329-all.csv'
-    mytext = '###################\nold file: ' + oldfile + '\nnew file: ' + newfile + '\n###################'
+    oldfile = input('Old file name: ')
+    newfile = input('New file name: ')
+    mytext = '\n\n###################\nOld file: ' + oldfile + '\nNew file: ' + newfile + '\n###################'
     output_to_file(mytext)
     file_compare(rootpath + oldfile, rootpath + newfile)
     
